@@ -45,7 +45,6 @@ export default class MotionTrail extends cc.RenderComponent {
         this.enabled = value;
         this.$updateActive();
     }
-
     @property
     _isWorldXY: boolean = true;
     @property({ displayName: CC_DEV && '世界坐标', tooltip: CC_DEV && '顶点坐标是世界坐标还是本地坐标' })
@@ -118,7 +117,7 @@ export default class MotionTrail extends cc.RenderComponent {
     protected _resetAssembler() {
         let assembler = this['_assembler'] = new Assembler2D();
         assembler['init'](this);
-        assembler['updateRenderData'] = this.$onFlush.bind(this);
+        assembler['updateRenderData'] = this.$onFlushed.bind(this);
         this.$flush = this['setVertsDirty'];
         let renderData = this.renderData = new cc['RenderData']();
         renderData.init(assembler);
@@ -191,7 +190,7 @@ export default class MotionTrail extends cc.RenderComponent {
         this.$flush();
     }
 
-    protected $onFlush() {
+    protected $onFlushed() {
         if (this.active === false) return;
         if (this.$spriteFrame === null) return;
         if (this.length === 0) return;
