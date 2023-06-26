@@ -121,7 +121,7 @@ export default class MotionTrail extends cc.RenderComponent {
         this.$flush = this['setVertsDirty'];
         let renderData = this.renderData = new cc['RenderData']();
         renderData.init(assembler);
-        this.meshID = this.renderData.meshCount;
+        this.meshID = renderData.meshCount;
         this.$init();
     }
 
@@ -217,6 +217,23 @@ export default class MotionTrail extends cc.RenderComponent {
         this.$updateXY();
     }
 
+    private $updateSpriteFrame() {
+        let frame = this.$spriteFrame;
+        let material = this.getMaterial(0) || cc.Material.getBuiltinMaterial('2d-sprite');
+        material.define("USE_TEXTURE", true);
+        material.setProperty("texture", frame ? frame.getTexture() : null);
+        if (CC_EDITOR) {
+            if (frame && frame.isValid && frame['_atlasUuid']) {
+                cc.assetManager.loadAny(frame['_atlasUuid'], (err, asset: cc.SpriteAtlas) => {
+                    this.atlas = asset;
+                });
+            } else {
+                this.atlas = null;
+            }
+        }
+        this.$updateUV();
+    }
+
     protected $updateXY() {
         let vData = this.$getVData();
         let a = null, b = null;
@@ -256,32 +273,6 @@ export default class MotionTrail extends cc.RenderComponent {
         this.$fitXY();
     }
 
-    private $updateSpriteFrame() {
-        let frame = this.$spriteFrame;
-        let material = this.getMaterial(0) || cc.Material.getBuiltinMaterial('2d-sprite');
-        material.define("USE_TEXTURE", true);
-        material.setProperty("texture", frame ? frame.getTexture() : null);
-        if (CC_EDITOR) {
-            if (frame && frame.isValid && frame['_atlasUuid']) {
-                cc.assetManager.loadAny(frame['_atlasUuid'], (err, asset: cc.SpriteAtlas) => {
-                    this.atlas = asset;
-                });
-            } else {
-                this.atlas = null;
-            }
-        }
-        this.$updateUV();
-    }
-
-    protected $updateIndice() {
-        let iData = this.$getIData();
-        for (let i = 0, id = 0, len = this.$iDataLength; i < len; ++id) {
-            iData[i++] = id;
-            iData[i++] = id + 1;
-            iData[i++] = id + 2;
-        }
-    }
-
     private $updateUV() {
         if (this.$spriteFrame === null) return;
         let vData = this.$getVData();
@@ -307,6 +298,15 @@ export default class MotionTrail extends cc.RenderComponent {
             id += step;
             uintVData[id] = color;
             id += step;
+        }
+    }
+
+    protected $updateIndice() {
+        let iData = this.$getIData();
+        for (let i = 0, id = 0, len = this.$iDataLength; i < len; ++id) {
+            iData[i++] = id;
+            iData[i++] = id + 1;
+            iData[i++] = id + 2;
         }
     }
 
