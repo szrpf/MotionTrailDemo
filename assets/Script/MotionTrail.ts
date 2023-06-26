@@ -23,8 +23,8 @@ class TrailData {
 }
 const { ccclass, property, menu, playOnFocus } = cc._decorator;
 @ccclass
-@menu('Comp/MotionTrail')
 @playOnFocus
+@menu('Comp/MotionTrail')
 export default class MotionTrail extends cc.RenderComponent {
     @property({ type: cc.SpriteAtlas, editorOnly: true, readonly: true, animatable: false, displayName: CC_DEV && 'Atlas' })
     private atlas: cc.SpriteAtlas = null;
@@ -122,17 +122,17 @@ export default class MotionTrail extends cc.RenderComponent {
         let renderData = this.renderData = new cc['RenderData']();
         renderData.init(assembler);
         this.meshID = this.renderData.meshCount;
+        this.$init();
     }
 
     $updateActive() {
-        if(this.active){
+        if (this.active) {
             this.node['_updateWorldMatrix']();
             this.resetPos();
         }
     }
 
     protected start() {
-        this.$init();
         this.$updateSpriteFrame();
         cc.director.once(cc.Director.EVENT_AFTER_DRAW, this.$updateColor, this);
     }
@@ -141,7 +141,6 @@ export default class MotionTrail extends cc.RenderComponent {
         this.$setVFmt();
         this.updateLength();
         this.updateWidth();
-        this.resetPos();
         this.node.on(cc.Node.EventType.COLOR_CHANGED, this.$updateColor, this);
     }
     //设置顶点格式
@@ -200,10 +199,11 @@ export default class MotionTrail extends cc.RenderComponent {
         }
         let data = this.trailData;
         for (let i = this.length - 1; i > 0; --i) {
-            data[i].x = data[i - 1].x;
-            data[i].y = data[i - 1].y;
-            data[i].sin = data[i - 1].sin;
-            data[i].cos = data[i - 1].cos;
+            let cur = data[i], prev = data[i - 1];
+            cur.x = prev.x;
+            cur.y = prev.y;
+            cur.sin = prev.sin;
+            cur.cos = prev.cos;
         }
         if (this.$isWorldXY) {
             this.node['_updateWorldMatrix']();
@@ -287,13 +287,11 @@ export default class MotionTrail extends cc.RenderComponent {
         let vData = this.$getVData();
         let step = this.$step;
         let uvStep = 1 / (this.trailData.length - 1);
-        let atlasW = this.$spriteFrame.getTexture().width;
-        let atlasH = this.$spriteFrame.getTexture().height;
-        let frameRect = this.$spriteFrame.getRect();
         for (let i = this.$uvOffset, id = 0, len = this.$vDataLength; i < len; i += step, ++id) {
-            vData[i] = ((id & 1) * frameRect.width + frameRect.x) / atlasW;
-            vData[i + 1] = ((1 - uvStep * (id >> 1)) * frameRect.height + frameRect.y) / atlasH;
+            vData[i] = id & 1;
+            vData[i + 1] = 1 - uvStep * (id >> 1);
         }
+        this.$fitUV();
     }
 
     protected $updateColor() {
@@ -377,6 +375,27 @@ export default class MotionTrail extends cc.RenderComponent {
                 let x = vData[i], y = vData[i + 1];
                 vData[i] = x * m[0] + y * m[4] + tx;
                 vData[i + 1] = x * m[1] + y * m[5] + ty;
+            }
+        }
+    }
+    //自动适配UV，修改顶点uv数据后需主动调用该函数
+    protected $fitUV() {
+        if (this.$spriteFrame === null) return;
+        let step = this.$step;
+        let atlasW = this.$spriteFrame.getTexture().width;
+        let atlasH = this.$spriteFrame.getTexture().height;
+        let frameRect = this.$spriteFrame.getRect();
+        let vData = this.$getVData();
+        if (this.$spriteFrame['_rotated']) {
+            for (let i = this.$uvOffset, id = 0, len = this.$vDataLength; i < len; i += step, ++id) {
+                let tmp = vData[i];
+                vData[i] = ((1 - vData[i + 1]) * frameRect.height + frameRect.x) / atlasW;
+                vData[i + 1] = (tmp * frameRect.width + frameRect.y) / atlasH;
+            }
+        } else {
+            for (let i = this.$uvOffset, id = 0, len = this.$vDataLength; i < len; i += step, ++id) {
+                vData[i] = (vData[i] * frameRect.width + frameRect.x) / atlasW;
+                vData[i + 1] = (vData[i + 1] * frameRect.height + frameRect.y) / atlasH;
             }
         }
     }

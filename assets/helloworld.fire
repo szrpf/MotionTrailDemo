@@ -533,8 +533,8 @@
     "_opacity": 255,
     "_color": {
       "__type__": "cc.Color",
-      "r": 0,
-      "g": 240,
+      "r": 255,
+      "g": 255,
       "b": 255,
       "a": 255
     },
@@ -690,7 +690,7 @@
       "__uuid__": "f1244010-2872-4697-8ee7-3bf6db2229e7"
     },
     "_spriteFrame": {
-      "__uuid__": "8a36e65b-0c3a-42e9-ab5e-89f978d1c4b6"
+      "__uuid__": "fb19e673-9a87-42d3-85e8-bf6dbc2facd0"
     },
     "_active": true,
     "_isWorldXY": true,
@@ -703,7 +703,7 @@
     "_headWidth": 100,
     "_tailWidth": 0,
     "_headOpacity": 255,
-    "_tailOpacity": 0,
+    "_tailOpacity": 255,
     "_id": "a3M00jLuFCd7mem/ckIyLn"
   },
   {
