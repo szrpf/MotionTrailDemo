@@ -26,7 +26,7 @@ const { ccclass, property, menu, playOnFocus } = cc._decorator;
 @playOnFocus
 @menu('Comp/MotionTrail')
 export default class MotionTrail extends cc.RenderComponent {
-    @property({ type: cc.SpriteAtlas, editorOnly: true, readonly: true, animatable: false, displayName: CC_DEV && 'Atlas' })
+    @property({ type: cc.SpriteAtlas, editorOnly: true, readonly: true, displayName: CC_DEV && 'Atlas' })
     private atlas: cc.SpriteAtlas = null;
     @property
     private _spriteFrame: cc.SpriteFrame = null;
@@ -49,7 +49,7 @@ export default class MotionTrail extends cc.RenderComponent {
     _isWorldXY: boolean = true;
     @property({ displayName: CC_DEV && '世界坐标', tooltip: CC_DEV && '顶点坐标是世界坐标还是本地坐标' })
     get $isWorldXY() { return this._isWorldXY; }
-    private set $isWorldXY(value: boolean) {
+    set $isWorldXY(value: boolean) {
         this._isWorldXY = value;
         this.$updateXY();
     }
@@ -104,7 +104,7 @@ export default class MotionTrail extends cc.RenderComponent {
     private capacity: number = 0;
     private verticesCount: number = 0;       //顶点数量
     private indicesCount: number = 0;        //三角形数量 * 3
-    $flush: Function = null;                 //onFlush中更新的顶点数据，需要调用flush才会被提交
+    $flush: Function = null;                 //onFlushed中更新的顶点数据，需要调用flush才会被提交
     $xyOffset: number = 1e8;                 //顶点坐标数据，在顶点数组中的偏移
     $uvOffset: number = 1e8;                 //顶点uv数据，在顶点数组中的偏移
     $colorOffset: number = 1e8;              //顶点颜色数据，在顶点数组中的偏移
@@ -125,23 +125,16 @@ export default class MotionTrail extends cc.RenderComponent {
         this.$init();
     }
 
-    $updateActive() {
-        if (this.active) {
-            this.node['_updateWorldMatrix']();
-            this.resetPos();
-        }
+    protected $init() {
+        this.$setVFmt();
+        this.updateLength();
+        this.updateWidth();
+        this.node.on(cc.Node.EventType.COLOR_CHANGED, this.$updateColor, this);
     }
 
     protected start() {
         this.$updateSpriteFrame();
         cc.director.once(cc.Director.EVENT_AFTER_DRAW, this.$updateColor, this);
-    }
-
-    $init() {
-        this.$setVFmt();
-        this.updateLength();
-        this.updateWidth();
-        this.node.on(cc.Node.EventType.COLOR_CHANGED, this.$updateColor, this);
     }
     //设置顶点格式
     protected $setVFmt(vfmt = new gfx.VertexFormat([
@@ -215,6 +208,13 @@ export default class MotionTrail extends cc.RenderComponent {
             data[0].y = this.offset.y + this.node.y;
         }
         this.$updateXY();
+    }
+
+    protected $updateActive() {
+        if (this.active) {
+            this.node['_updateWorldMatrix']();
+            this.resetPos();
+        }
     }
 
     private $updateSpriteFrame() {
@@ -322,8 +322,8 @@ export default class MotionTrail extends cc.RenderComponent {
     private updateWidth() {
         let data = this.trailData;
         let trailLen = this.length;
-        let headHalfW = this.headWidth / 2;
-        let disDelt = (headHalfW - this.tailWidth / 2) / (trailLen - 1);
+        let headHalfW = this.headWidth * 0.5;
+        let disDelt = (headHalfW - this.tailWidth * 0.5) / (trailLen - 1);
         for (let i = 0; i < trailLen; ++i) {
             data[i].dis = headHalfW - disDelt * i;
         }
