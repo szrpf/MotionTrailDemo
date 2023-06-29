@@ -130,6 +130,7 @@ export default class MotionTrail extends cc.RenderComponent {
         this.updateLength();
         this.updateWidth();
         this.node.on(cc.Node.EventType.COLOR_CHANGED, this.$updateColor, this);
+        this.resetPos();
     }
 
     protected start() {
@@ -199,8 +200,8 @@ export default class MotionTrail extends cc.RenderComponent {
             cur.cos = prev.cos;
         }
         if (this.$isWorldXY) {
-            this.node['_updateWorldMatrix']();
             let m = this.node['_worldMatrix'].m;
+            this.node['_updateWorldMatrix']();
             data[0].x = this.offset.x + m[12];
             data[0].y = this.offset.y + m[13];
         } else {
@@ -212,7 +213,6 @@ export default class MotionTrail extends cc.RenderComponent {
 
     protected $updateActive() {
         if (this.active) {
-            this.node['_updateWorldMatrix']();
             this.resetPos();
         }
     }
@@ -335,6 +335,7 @@ export default class MotionTrail extends cc.RenderComponent {
         let ty = this.offset.y;
         if (this.$isWorldXY) {
             let m = this.node['_worldMatrix'].m;
+            this.node['_updateWorldMatrix']();
             tx += m[12];
             ty += m[13];
         } else {
