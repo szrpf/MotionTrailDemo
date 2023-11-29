@@ -21,7 +21,7 @@ class TrailData {
     cos: number = 0;
     sin: number = 0;
 }
-const { ccclass, property, menu, playOnFocus } = cc._decorator;
+const { ccclass, property, playOnFocus, menu } = cc._decorator;
 @ccclass
 @playOnFocus
 @menu('Comp/MotionTrail')
@@ -146,7 +146,7 @@ export default class MotionTrail extends cc.RenderComponent {
         let assembler = this['_assembler'];
         cc.sys.isNative && assembler['setVertexFormat'](vfmt);
         let fmtElement = vfmt._elements;
-        for (let i = fmtElement.length - 1; i >= 0; --i) {
+        for (let i = fmtElement.length - 1; i > -1; --i) {
             this.$step += fmtElement[i].bytes >> 2;
         }
         let fmtAttr = vfmt._attr2el;
@@ -212,9 +212,7 @@ export default class MotionTrail extends cc.RenderComponent {
     }
 
     protected $updateActive() {
-        if (this.active) {
-            this.resetPos();
-        }
+        this.active && this.resetPos();
     }
 
     private $updateSpriteFrame() {
@@ -223,7 +221,7 @@ export default class MotionTrail extends cc.RenderComponent {
         material.define("USE_TEXTURE", true);
         material.setProperty("texture", frame ? frame.getTexture() : null);
         if (CC_EDITOR) {
-            if (frame && frame.isValid && frame['_atlasUuid']) {
+            if (frame?.isValid && frame['_atlasUuid']) {
                 cc.assetManager.loadAny(frame['_atlasUuid'], (err, asset: cc.SpriteAtlas) => {
                     this.atlas = asset;
                 });
@@ -270,7 +268,6 @@ export default class MotionTrail extends cc.RenderComponent {
         id += step;
         vData[id] = bx - b.dis * a.sin;
         vData[id + 1] = by + b.dis * a.cos;
-        this.$fitXY();
     }
 
     private $updateUV() {
@@ -342,7 +339,7 @@ export default class MotionTrail extends cc.RenderComponent {
             tx += this.node.x;
             ty += this.node.y;
         }
-        for (let i = this.length - 1; i >= 0; --i) {
+        for (let i = this.length - 1; i > -1; --i) {
             data[i].x = tx;
             data[i].y = ty;
         }
@@ -351,32 +348,6 @@ export default class MotionTrail extends cc.RenderComponent {
         for (let i = 0, len = this.$vDataLength; i < len; i += step) {
             vData[i] = tx;
             vData[i + 1] = ty;
-        }
-        this.$fitXY();
-    }
-    //自动适配XY，修改顶点xy数据后需主动调用该函数
-    protected $fitXY() {
-        let vData = this.$getVData();
-        if (cc.sys.isNative) {
-            if (this.$isWorldXY) {
-                let m = this.node['_worldMatrix'].m;
-                let im = cc.Mat4.invert(new cc.Mat4(), this.node['_worldMatrix']).m;
-                for (let i = this.$xyOffset, len = this.$vDataLength; i < len; i += this.$step) {
-                    let wx = m[0] * vData[i] + m[4] * vData[i + 1];
-                    let wy = m[1] * vData[i] + m[5] * vData[i + 1];
-                    vData[i] = im[0] * wx + im[4] * wy + im[12];
-                    vData[i + 1] = im[1] * wx + im[5] * wy + im[13];
-                }
-            }
-        } else {
-            let m = this.node['_worldMatrix'].m;
-            let tx = this.$isWorldXY ? 0 : m[12];
-            let ty = this.$isWorldXY ? 0 : m[13];
-            for (let i = this.$xyOffset, len = this.$vDataLength; i < len; i += this.$step) {
-                let x = vData[i], y = vData[i + 1];
-                vData[i] = x * m[0] + y * m[4] + tx;
-                vData[i + 1] = x * m[1] + y * m[5] + ty;
-            }
         }
     }
     //自动适配UV，修改顶点uv数据后需主动调用该函数

@@ -1,7 +1,7 @@
 {
   "engine": "cocos2d-html5",
   "packages": "packages",
-  "version": "2.4.11",
+  "version": "2.4.12",
   "name": "MotionTrailDemo",
   "id": "b1ce7934-3a7f-4156-b862-9314aa84fff4",
   "isNew": false

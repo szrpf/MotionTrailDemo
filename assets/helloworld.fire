@@ -575,7 +575,7 @@
     "_is3DNode": false,
     "_groupIndex": 0,
     "groupIndex": 0,
-    "_id": "c4f30YOS65G64U2TwufdJ+2"
+    "_id": "c9sRbZ69tCqKP2mF8bO51X"
   },
   {
     "__type__": "cc.Node",
@@ -637,7 +637,7 @@
     "_is3DNode": false,
     "_groupIndex": 0,
     "groupIndex": 0,
-    "_id": "4dGIZC3a1BV7W0SmYelb50"
+    "_id": "b9dkubm7tJ2KQW2S6isTgH"
   },
   {
     "__type__": "cc.Sprite",
@@ -671,10 +671,10 @@
     "_atlas": {
       "__uuid__": "f1244010-2872-4697-8ee7-3bf6db2229e7"
     },
-    "_id": "5fMgRmT4lDVLB5M4NbSbNn"
+    "_id": "2djFUcv2pNwZEGzUwDKntf"
   },
   {
-    "__type__": "816bbXVNPJCx7oILAJwTt8o",
+    "__type__": "6d3caVPSKNFhq1dOICuaUqJ",
     "_name": "",
     "_objFlags": 0,
     "node": {
@@ -704,7 +704,7 @@
     "_tailWidth": 0,
     "_headOpacity": 255,
     "_tailOpacity": 255,
-    "_id": "5aJ4WFzSdCy6sNRq/3YHDM"
+    "_id": "5dxvR0HGhLCJ1R0hdVbDaT"
   },
   {
     "__type__": "cc.Canvas",
