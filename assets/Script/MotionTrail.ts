@@ -221,7 +221,7 @@ export default class MotionTrail extends cc.RenderComponent {
         material.define("USE_TEXTURE", true);
         material.setProperty("texture", frame ? frame.getTexture() : null);
         if (CC_EDITOR) {
-            if (frame?.isValid && frame['_atlasUuid']) {
+            if (frame && frame.isValid && frame['_atlasUuid']) {
                 cc.assetManager.loadAny(frame['_atlasUuid'], (err, asset: cc.SpriteAtlas) => {
                     this.atlas = asset;
                 });
