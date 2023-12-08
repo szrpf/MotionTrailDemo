@@ -112,7 +112,6 @@ export default class MotionTrail extends cc.RenderComponent {
     get $vDataLength() { return this.verticesCount * this.$step; }
     get $iDataLength() { return this.indicesCount; }
     private trailData: TrailData[] = [];
-    private nodeOpacity: number = 255;
 
     protected _resetAssembler() {
         let assembler = this['_assembler'] = new Assembler2D();
@@ -187,10 +186,6 @@ export default class MotionTrail extends cc.RenderComponent {
         if (this.active === false) return;
         if (this.$spriteFrame === null) return;
         if (this.length === 0) return;
-        if (this.nodeOpacity !== this.node.opacity) {
-            this.nodeOpacity = this.node.opacity;
-            this.$updateColor();
-        }
         let data = this.trailData;
         for (let i = this.length - 1; i > 0; --i) {
             let cur = data[i], prev = data[i - 1];
